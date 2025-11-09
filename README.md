@@ -1,16 +1,16 @@
 # task_management
 
-A new Flutter project.
+New flutter app made for Assignment Purpose for Credes
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+## To Run the app follow the commands listed below
 
-A few resources to get you started if this is your first Flutter project:
+-- To resolve all the dependecies--
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```sh flutter pub get```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+-- To run the flutter app --
+
+```sh flutter run ```

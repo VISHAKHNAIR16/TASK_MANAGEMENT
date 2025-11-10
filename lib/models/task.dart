@@ -1,5 +1,5 @@
 class Task {
-  final int status, id , priority;
+  final int status, id , priority,type;
   final String content;
   final DateTime? dueDate;
 
@@ -10,5 +10,6 @@ class Task {
     required this.priority,
     required this.content,
     required this.dueDate,
+    required this.type,
   });
 }

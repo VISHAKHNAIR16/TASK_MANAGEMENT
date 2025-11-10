@@ -1,96 +1,152 @@
 import 'package:flutter/material.dart';
-import 'package:task_management/models/task.dart';
-import 'package:task_management/services/database_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:task_management/controllers/home_screen_controller.dart';
+import 'package:task_management/controllers/providers.dart';
+import 'package:task_management/models/task_list.dart';
+import 'package:task_management/widgets/task_list_title.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final taskList = ref.watch(homeScreenControllerProvider);
+    final controller = ref.read(homeScreenControllerProvider.notifier);
 
-class _HomeScreenState extends State<HomeScreen> {
-  final DatabaseService _databaseService = DatabaseService.instance;
-  String? _task = null;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _floatingButton(),
-      body: _tasksList(),
+      appBar: _customAppBar(context),
+      floatingActionButton: _floatingButton(context, controller),
+      body: _tasksList(taskList, controller),
     );
   }
 
-  Widget _tasksList() {
-    return FutureBuilder(
-      future: _databaseService.getTask(),
-      builder: (context, snapshot) {
-        return ListView.builder(
-          itemCount: snapshot.data?.length ?? 0,
-          itemBuilder: (context, index) {
-            Task task = snapshot.data![index];
-            return ListTile(
-              onLongPress: () {
-                _databaseService.deleteTask(task.id);
-                setState(() {});
-              },
-              title: Text(task.content),
-              trailing: Checkbox(
-                value: task.status == 1,
-                onChanged: (value) {
-                  _databaseService.updateTaskStatus(
-                    task.id,
-                    value == true ? 1 : 0,
-                  );
-                  setState(() {});
-                },
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _floatingButton() {
+  Widget _floatingButton(
+    BuildContext context,
+    HomeScreenController controller,
+  ) {
     return FloatingActionButton(
-      child: Icon(Icons.add),
       onPressed: () {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text("Add Task"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  onChanged: (value) {
-                    setState(() {
-                      _task = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Add your task...",
-                  ),
-                ),
-                MaterialButton(
-                  onPressed: () async {
-  if (_task == null || _task!.isEmpty) return;
-  await _databaseService.addTask(_task!);
-  setState(() {
-    _task = null;
-  });
-  Navigator.pop(context);
-},
+        _showAddTaskDialog(context, controller);
+      },
+      child: Icon(Icons.add),
+    );
+  }
 
-                  child: Text("Done"),
-                ),
-              ],
+  PreferredSizeWidget _customAppBar(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height * 0.14;
+
+    return PreferredSize(
+      preferredSize: Size.fromHeight(height),
+      child: SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(30),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Row (Hello + Notification)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "Hello, Mo",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "Welcome Back",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.notifications_none_outlined,
+                      size: 28,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showAddTaskDialog(
+    BuildContext context,
+    HomeScreenController controller,
+  ) {
+    String? inputTask;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Add Task'),
+        content: TextField(
+          onChanged: (value) {
+            inputTask = value;
+          },
+          decoration: InputDecoration(hintText: 'Task description'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (inputTask != null && inputTask!.isNotEmpty) {
+                await controller.addTask(inputTask!);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tasksList(TaskList taskList, HomeScreenController controller) {
+    final tasks = taskList.data ?? [];
+
+    return SafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+                return TaskListTitle(task: task, controller: controller);
+              },
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
+
+  // Widget _taskListTile(Task task, HomeScreenController controller) {
+  //   return ListTile(
+  //     title: Text(task.content),
+  //     trailing: Checkbox(
+  //       value: task.status == 1,
+  //       onChanged: (bool? value) {
+  //         controller.updateTaskStatus(task.id, value == true ? 1 : 0);
+  //       },
+  //     ),
+  //     onLongPress: () {
+  //       controller.deleteTask(task.id);
+  //     },
+  //   );
+  // }
 }

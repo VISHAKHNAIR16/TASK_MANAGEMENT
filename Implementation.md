@@ -30,8 +30,8 @@ has coloumn like this
 
 ################# TABLE tasks ########################
 
----- ID ---- Content ---- Priority ---- Status ----- DueDate?------
----- Int Primary Key ---- String Not Null ---- Int ---- Status Not Null ----- Date Which Can be null--------
+---- ID ---- Content ---- Priority ---- Status ----- 
+---- Int Primary Key ---- String Not Null ---- Int ---- Status Not Null -----
 
 
 
@@ -49,6 +49,24 @@ After making a rough CRUD operations and checking it using a normal UI I have co
 ## Now moving to advanced Database Like Migrations and error Handling 
 
 
+For advanced Error Handling I have used Logger package which is easier to log message and also can be used via Remote Error handling which flutter Crashlytics already Provides 
+
+
+Also Added one Data Migration Scheme where I have added a Duedate column Which I missed So Now our column Look Like this 
+
+---- ID ---- Content ---- Priority ---- Status ----- DueDate?------
+---- Int Primary Key ---- String Not Null ---- Int ---- Status Not Null ----- Date Which Can be null--------
+
+handled all the neccessary Error handling And dealt with the data Migration in version 2 part where the column  Duedate will be added without changing the database 
+just altering or adding the column in that just to make sure when one coloumn
 
 
 
+## Now After this lets manage the state Flow Or The backend Struture with RiverPod
+
+Now I have first made few changes to my yaml file I have added riverpod in it to make the backend and state management.
+
+After anaylzing the App architecture I found out that I needed to wrap the database by repository layer such that all the db execution and all
+is being done in the is repo layer only so made a task repository layer which has all the methods to be called to the database service layer
+
+after making the repo now I have made 

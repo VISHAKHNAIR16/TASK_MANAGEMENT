@@ -16,6 +16,7 @@ class DatabaseService {
   final String _tasksStatusColoumnName = "status";
   final String _tasksPriorityColoumnName = "priority";
   final String _tasksDueDateColumnName = 'duedate';
+  final String _tasksTypeColumnName = 'type';
 
   DatabaseService._constructor();
 
@@ -42,7 +43,7 @@ class DatabaseService {
     final databasePath = join(databaseDirPath, "Tasks_List.db");
     final database = await openDatabase(
       databasePath,
-      version: 2, 
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
       CREATE TABLE $_taskTableName (
@@ -50,7 +51,8 @@ class DatabaseService {
         $_tasksContentColumnName TEXT NOT NULL,
         $_tasksStatusColoumnName INTEGER NOT NULL,
         $_tasksPriorityColoumnName INTEGER,
-        $_tasksDueDateColumnName INTEGER
+        $_tasksDueDateColumnName INTEGER,
+        $_tasksTypeColumnName INTEGER
       );
     ''');
       },
@@ -58,6 +60,11 @@ class DatabaseService {
         if (oldVersion < 2) {
           await db.execute(
             'ALTER TABLE $_taskTableName ADD COLUMN $_tasksDueDateColumnName INTEGER;',
+          );
+        }
+        if (oldVersion < 3) {
+          await db.execute(
+            'ALTER TABLE $_taskTableName ADD COLUMN $_tasksTypeColumnName INTEGER;',
           );
         }
       },
@@ -73,6 +80,7 @@ class DatabaseService {
         _tasksStatusColoumnName: 0,
         _tasksPriorityColoumnName: 0,
         _tasksDueDateColumnName: dueDate?.millisecondsSinceEpoch,
+        _tasksTypeColumnName: 0,
       });
     }, "Failed To Add Task");
   }
@@ -84,13 +92,20 @@ class DatabaseService {
       return data
           .map(
             (e) => Task(
-              id: e["Id"] as int,
-              status: e["status"] as int,
-              priority: e["priority"] as int,
-              content: e["content"] as String,
-              dueDate: e['dueDate'] != null
-                  ? DateTime.fromMillisecondsSinceEpoch(e['dueDate'] as int)
+              id: e[_tasksIdColumnName] as int,
+              status: e[_tasksStatusColoumnName] as int,
+              priority: e[_tasksPriorityColoumnName] as int,
+              content: e[_tasksContentColumnName] as String,
+
+              dueDate: e[_tasksDueDateColumnName] != null
+                  ? DateTime.fromMillisecondsSinceEpoch(
+                      e[_tasksDueDateColumnName] as int,
+                    )
                   : null,
+
+              type: e[_tasksTypeColumnName] != null
+                  ? e[_tasksTypeColumnName] as int
+                  : 0,
             ),
           )
           .toList();

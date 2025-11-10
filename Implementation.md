@@ -30,9 +30,25 @@ has coloumn like this
 
 ################# TABLE tasks ########################
 
----- ID ---- Content ---- Priority ---- Status -----
----- Int Primary Key ---- String Not Null ---- Int ---- Status Not Null -----
+---- ID ---- Content ---- Priority ---- Status ----- DueDate?------
+---- Int Primary Key ---- String Not Null ---- Int ---- Status Not Null ----- Date Which Can be null--------
 
 
 
 So after that in the database_service.dart file I have added the CRUD operations such as add, delete and update for the start to confirm it is working lets validate this also 
+
+
+Also made a Model for tasks which has all the content and making it as a object for accessing it in other dart files also '
+
+
+
+After making a rough CRUD operations and checking it using a normal UI I have commited my code now
+
+
+
+## Now moving to advanced Database Like Migrations and error Handling 
+
+
+
+
+

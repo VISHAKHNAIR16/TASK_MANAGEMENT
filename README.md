@@ -6,11 +6,18 @@ New flutter app made for Assignment Purpose for Credes
 
 ## To Run the app follow the commands listed below
 
+
+-- Read the Implementation.md to Know how I Made this --
+```implementation.md ```
+
+
 -- To resolve all the dependecies--
 
-```sh flutter pub get```
+```flutter pub get```
 
 
 -- To run the flutter app --
 
-```sh flutter run ```
+```flutter run ```
+
+
